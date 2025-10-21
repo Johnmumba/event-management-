@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Event Management App
 
 A full-stack event management application built with Elysia.js, Bun, and PostgreSQL.
@@ -28,3 +29,7 @@ A full-stack event management application built with Elysia.js, Bun, and Postgre
 ## Deployment
 
 This app is deployed on Render and uses Neon PostgreSQL database.
+=======
+# event-management-
+Full-stack event management application with Elysia.js, Bun, and PostgreSQL
+>>>>>>> 3916de8657f8099cffb9b75df5016b106f8e7000
