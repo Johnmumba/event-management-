@@ -1,38 +1,51 @@
 import { Elysia } from 'elysia'
 import { PrismaClient } from '@prisma/client'
 import { readFile } from 'fs/promises'
-import { join } from 'path'
+import { join, extname } from 'path'
 
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 3000
 
 const app = new Elysia()
 
-// Simple file serving that works
-.get('/', async () => {
-  try {
-    const html = await readFile(join(process.cwd(), 'event-frontend', 'index.html'), 'utf-8')
-    return html
-  } catch (error) {
-    return '<h1>Event Management App - Backend Running</h1><p><a href="/health">Health Check</a></p>'
+// Serve ALL frontend files dynamically
+.get('/*', async ({ request }) => {
+  const url = new URL(request.url)
+  const pathname = url.pathname
+  
+  // Default to index.html for root
+  if (pathname === '/') {
+    try {
+      const html = await readFile(join(process.cwd(), 'event-frontend', 'index.html'), 'utf-8')
+      return new Response(html, {
+        headers: { 'Content-Type': 'text/html' }
+      })
+    } catch (error) {
+      return new Response('Not found', { status: 404 })
+    }
   }
-})
 
-.get('/styles.css', async () => {
+  // Serve other files (CSS, JS, etc.)
   try {
-    const css = await readFile(join(process.cwd(), 'event-frontend', 'styles.css'), 'utf-8')
-    return css
+    const filePath = join(process.cwd(), 'event-frontend', pathname)
+    const content = await readFile(filePath, 'utf-8')
+    
+    // Set correct content type
+    const ext = extname(pathname)
+    const contentTypes: Record<string, string> = {
+      '.css': 'text/css',
+      '.js': 'application/javascript',
+      '.html': 'text/html',
+      '.json': 'application/json'
+    }
+    
+    return new Response(content, {
+      headers: { 
+        'Content-Type': contentTypes[ext] || 'text/plain'
+      }
+    })
   } catch (error) {
-    return 'body { font-family: Arial; padding: 20px; }'
-  }
-})
-
-.get('/app.js', async () => {
-  try {
-    const js = await readFile(join(process.cwd(), 'event-frontend', 'app.js'), 'utf-8')
-    return js
-  } catch (error) {
-    return 'console.log("Event App Loaded")'
+    return new Response('Not found', { status: 404 })
   }
 })
 
@@ -53,3 +66,4 @@ const app = new Elysia()
 .listen(PORT)
 
 console.log(`🚀 Server running on http://localhost:${PORT}`)
+console.log(`📁 Serving files from: ${join(process.cwd(), 'event-frontend')}`)
