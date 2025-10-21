@@ -2,5 +2,5 @@ import { Elysia } from 'elysia'
 import { authControllers } from '../controllers/auth.controllers.js'
 
 export default new Elysia()
-  .post('/signup', (context) => authControllers.signup(context))
-  .post('/login', (context) => authControllers.login(context))
+  .post('/signup', ({ body }: any) => authControllers.signup({ body }))
+  .post('/login', ({ body }: any) => authControllers.login({ body }))
