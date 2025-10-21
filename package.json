@@ -4,11 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "start": "bun src/index.ts",
-    "build": "echo 'No build step needed for Bun'",
+    "start": "node build/index.js",
+    "build": "tsc",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
     "db:studio": "prisma studio"
   },
   "dependencies": {
@@ -23,6 +22,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "prisma": "^6.17.1"
+    "prisma": "^6.17.1",
+    "typescript": "^5.3.3"
   }
 }
