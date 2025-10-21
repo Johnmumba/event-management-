@@ -7,10 +7,8 @@ import eventRoutes from './routes/event.routes.js'
 import rsvpRoutes from './routes/rsvp.routes.js'
 import notificationRoutes from './routes/notification.routes.js'
 import { readFile } from 'fs/promises'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { join } from 'path'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 3000
 
@@ -26,152 +24,107 @@ const app = new Elysia()
     }
   }))
   
-  // Serve frontend files - FIXED PATHS
-  .get('/', async () => {
+  // Serve frontend files - SIMPLIFIED RESPONSE
+  .get('/', async ({ set }) => {
     try {
-      // Try multiple possible paths
-      const paths = [
-        join(process.cwd(), 'event-frontend', 'index.html'),
-        join(__dirname, '..', 'event-frontend', 'index.html'),
-        join(process.cwd(), 'index.html')
-      ]
-      
-      let html = ''
-      for (const path of paths) {
-        try {
-          html = await readFile(path, 'utf-8')
-          console.log('Successfully loaded HTML from:', path)
-          break
-        } catch (e) {
-          console.log('Failed to load from:', path)
-        }
-      }
-      
-      if (!html) {
-        // Fallback: serve a basic HTML page
-        html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Event Management App</title>
-            <style>
-                body { font-family: Arial; padding: 40px; text-align: center; background: #f5f5f5; }
-                .container { max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                h1 { color: #333; }
-                button { padding: 15px 30px; margin: 10px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-                #result { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>🎉 Event Management App</h1>
-                <p>Backend is running! Frontend files being optimized...</p>
-                <div>
-                    <button onclick="testAPI()">Test Backend API</button>
-                    <button onclick="testHealth()">Test Health Check</button>
-                </div>
-                <div id="result"></div>
-            </div>
-            <script>
-                const baseUrl = window.location.origin;
-                
-                async function testAPI() {
-                    try {
-                        const response = await fetch(baseUrl + '/health');
-                        const data = await response.json();
-                        document.getElementById('result').innerHTML = 
-                            '<h3>✅ Backend Working!</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                    } catch (error) {
-                        document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
-                    }
-                }
-                
-                async function testHealth() {
-                    try {
-                        const response = await fetch(baseUrl + '/health');
-                        const data = await response.json();
-                        document.getElementById('result').innerHTML = 
-                            '✅ <strong>Health:</strong> ' + data.status + '<br>' +
-                            '✅ <strong>Database:</strong> ' + data.database + '<br>' +
-                            '✅ <strong>Environment:</strong> ' + data.environment;
-                    } catch (error) {
-                        document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
-                    }
-                }
-            </script>
-        </body>
-        </html>
-        `
-      }
-      
-      return new Response(html, {
-        headers: { 'Content-Type': 'text/html' }
-      })
+      const html = await readFile(join(process.cwd(), 'event-frontend', 'index.html'), 'utf-8')
+      set.headers['Content-Type'] = 'text/html'
+      return html
     } catch (error: any) {
       console.error('Error serving index.html:', error.message)
-      return new Response('Frontend error: ' + error.message, { status: 500 })
+      
+      // Fallback HTML
+      set.headers['Content-Type'] = 'text/html'
+      return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Event Management App</title>
+          <style>
+              body { font-family: Arial; padding: 40px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: white; }
+              .container { max-width: 600px; margin: 100px auto; background: rgba(255,255,255,0.1); padding: 40px; border-radius: 15px; backdrop-filter: blur(10px); }
+              h1 { font-size: 2.5rem; margin-bottom: 20px; }
+              button { padding: 15px 30px; margin: 10px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.3s; }
+              button:hover { transform: translateY(-2px); background: #45a049; }
+              #result { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 8px; text-align: left; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>🎉 Event Management App</h1>
+              <p>Backend is running! Testing frontend loading...</p>
+              <div>
+                  <button onclick="testHealth()">Test Health Check</button>
+                  <button onclick="testEvents()">Test Events API</button>
+                  <button onclick="testSwagger()">View API Docs</button>
+              </div>
+              <div id="result"></div>
+          </div>
+          <script>
+              const baseUrl = window.location.origin;
+              
+              async function testHealth() {
+                  try {
+                      const response = await fetch(baseUrl + '/health');
+                      const data = await response.json();
+                      document.getElementById('result').innerHTML = 
+                          '<h3>✅ Backend Working!</h3>' +
+                          '<strong>Status:</strong> ' + data.status + '<br>' +
+                          '<strong>Database:</strong> ' + data.database + '<br>' +
+                          '<strong>Environment:</strong> ' + data.environment + '<br>' +
+                          '<strong>Timestamp:</strong> ' + data.timestamp;
+                  } catch (error) {
+                      document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
+                  }
+              }
+              
+              async function testEvents() {
+                  try {
+                      const response = await fetch(baseUrl + '/events');
+                      const data = await response.json();
+                      if (data.error) {
+                          document.getElementById('result').innerHTML = 'Events API: ' + data.error + ' (Login required)';
+                      } else {
+                          document.getElementById('result').innerHTML = 'Events API: Working! ' + (data.events ? data.events.length + ' events' : 'No events');
+                      }
+                  } catch (error) {
+                      document.getElementById('result').innerHTML = '❌ Events Error: ' + error.message;
+                  }
+              }
+              
+              function testSwagger() {
+                  window.open(baseUrl + '/swagger', '_blank');
+              }
+              
+              console.log('Event Management App - Fallback Loaded');
+          </script>
+      </body>
+      </html>
+      `
     }
   })
   
-  .get('/styles.css', async () => {
+  .get('/styles.css', async ({ set }) => {
     try {
-      const paths = [
-        join(process.cwd(), 'event-frontend', 'styles.css'),
-        join(__dirname, '..', 'event-frontend', 'styles.css')
-      ]
-      
-      let css = ''
-      for (const path of paths) {
-        try {
-          css = await readFile(path, 'utf-8')
-          break
-        } catch (e) {
-          // Continue to next path
-        }
-      }
-      
-      if (!css) {
-        css = 'body { font-family: Arial; padding: 20px; }'
-      }
-      
-      return new Response(css, {
-        headers: { 'Content-Type': 'text/css' }
-      })
+      const css = await readFile(join(process.cwd(), 'event-frontend', 'styles.css'), 'utf-8')
+      set.headers['Content-Type'] = 'text/css'
+      return css
     } catch (error: any) {
-      return new Response('body { font-family: Arial; padding: 20px; }', {
-        headers: { 'Content-Type': 'text/css' }
-      })
+      console.error('Error serving CSS:', error.message)
+      set.headers['Content-Type'] = 'text/css'
+      return 'body { font-family: Arial; padding: 20px; }'
     }
   })
   
-  .get('/app.js', async () => {
+  .get('/app.js', async ({ set }) => {
     try {
-      const paths = [
-        join(process.cwd(), 'event-frontend', 'app.js'),
-        join(__dirname, '..', 'event-frontend', 'app.js')
-      ]
-      
-      let js = ''
-      for (const path of paths) {
-        try {
-          js = await readFile(path, 'utf-8')
-          break
-        } catch (e) {
-          // Continue to next path
-        }
-      }
-      
-      if (!js) {
-        js = 'console.log("Event Management App Loaded");'
-      }
-      
-      return new Response(js, {
-        headers: { 'Content-Type': 'application/javascript' }
-      })
+      const js = await readFile(join(process.cwd(), 'event-frontend', 'app.js'), 'utf-8')
+      set.headers['Content-Type'] = 'application/javascript'
+      return js
     } catch (error: any) {
-      return new Response('console.log("Event Management App Loaded");', {
-        headers: { 'Content-Type': 'application/javascript' }
-      })
+      console.error('Error serving JS:', error.message)
+      set.headers['Content-Type'] = 'application/javascript'
+      return 'console.log("Event Management App Loaded");'
     }
   })
   
