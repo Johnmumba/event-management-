@@ -1,11 +1,10 @@
 class EventApp {
     constructor() {
-        // Auto-detect base URL for production/development
-        this.baseUrl = window.location.origin;
+        this.baseUrl = 'http://localhost:3000';
         this.token = localStorage.getItem('token');
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
         
-        console.log('EventApp initialized - Base URL:', this.baseUrl);
+        console.log('EventApp initialized');
         this.initializeApp();
         this.bindEvents();
         this.startNotificationPolling();
@@ -81,70 +80,92 @@ class EventApp {
     }
 
     // 🔐 AUTHENTICATION METHODS
-        // In your handleSignup method:
-async handleSignup(e) {
-  e.preventDefault();
-  const email = document.getElementById('signupEmail').value;
-  const password = document.getElementById('signupPassword').value;
-  const role = document.getElementById('signupRole').value;
+    async handleLogin(e) {
+        console.log('Handling login...');
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-  try {
-    const response = await fetch(`${this.baseUrl}/api/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        email, 
-        password, 
-        name: email.split('@')[0] // Use email prefix as name
-      })
-    });
-    
-    const data = await response.json();
-    if (data.success) {
-      this.token = data.token;
-      this.user = data.user;
-      localStorage.setItem('token', this.token);
-      localStorage.setItem('user', JSON.stringify(this.user));
-      alert('Signup successful!');
-      this.hideModal('signupModal');
-      this.initializeApp();
-    } else {
-      alert(data.message);
+        if (!email || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        try {
+            console.log('Sending login request...');
+            const response = await fetch(`${this.baseUrl}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Login response:', data);
+
+            if (data.token) {
+                this.token = data.token;
+                this.user = data.user;
+                localStorage.setItem('token', this.token);
+                localStorage.setItem('user', JSON.stringify(this.user));
+                
+                alert('Login successful!');
+                this.hideModal('loginModal');
+                this.initializeApp();
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Network error: ' + error.message);
+        }
     }
-  } catch (error) {
-    alert('Error: ' + error.message);
-  }
-}
 
-// In your handleLogin method:
-async handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
+    async handleSignup(e) {
+        console.log('Handling signup...');
+        
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const role = document.getElementById('signupRole').value;
 
-  try {
-    const response = await fetch(`${this.baseUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    
-    const data = await response.json();
-    if (data.success) {
-      this.token = data.token;
-      this.user = data.user;
-      localStorage.setItem('token', this.token);
-      localStorage.setItem('user', JSON.stringify(this.user));
-      alert('Login successful!');
-      this.hideModal('loginModal');
-      this.initializeApp();
-    } else {
-      alert(data.message);
+        if (!email || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        try {
+            console.log('Sending signup request...');
+            const response = await fetch(`${this.baseUrl}/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, role })
+            });
+
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Signup response:', data);
+
+            if (data.token) {
+                this.token = data.token;
+                this.user = data.user;
+                localStorage.setItem('token', this.token);
+                localStorage.setItem('user', JSON.stringify(this.user));
+                
+                alert('Signup successful!');
+                this.hideModal('signupModal');
+                this.initializeApp();
+            } else {
+                alert(data.error || 'Signup failed');
+            }
+        } catch (error) {
+            console.error('Signup error:', error);
+            alert('Network error: ' + error.message);
+        }
     }
-  } catch (error) {
-    alert('Error: ' + error.message);
-  }
-}
 
     // 📅 EVENT METHODS
     async loadEvents() {

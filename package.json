@@ -5,23 +5,22 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "build": "echo 'No build step needed for Bun'",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "elysia": "0.8.17",
     "@prisma/client": "5.7.0",
-    "jsonwebtoken": "9.0.2",
-    "bcryptjs": "2.4.3"
+    "bcryptjs": "2.4.3",
+    "elysia": "^1.4.13",
+    "jsonwebtoken": "9.0.2"
   },
   "devDependencies": {
-    "typescript": "5.3.3",
-    "@types/node": "20.10.0",
     "@types/bcryptjs": "2.4.6",
     "@types/jsonwebtoken": "9.0.5",
-    "prisma": "5.7.0"
+    "@types/node": "20.10.0",
+    "prisma": "5.7.0",
+    "typescript": "5.3.3"
   }
 }
