@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia'
+import { cors } from '@elysiajs/cors'
 import { PrismaClient } from '@prisma/client'
 import authRoutes from './routes/auth.routes.js'
 import eventRoutes from './routes/event.routes.js'
@@ -10,15 +11,7 @@ import { join } from 'path'
 const prisma = new PrismaClient()
 
 const app = new Elysia()
-  // Enable CORS manually
-  .onRequest(({ request, set }) => {
-    set.headers['Access-Control-Allow-Origin'] = '*'
-    set.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    set.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-  })
-  .options('*', () => {
-    return new Response(null, { status: 204 })
-  })
+  .use(cors())
   
   // Serve frontend files
   .get('/', async () => {
