@@ -53,7 +53,8 @@ export const eventControllers = {
         return { error: 'Only admins can create events. Organizers can suggest events.' }
       }
 
-      const { title, description, date, location, capacity = 100 } = body
+      const { title, description, date, location, capacity: rawCapacity } = body
+      const capacity = rawCapacity && rawCapacity > 0 ? rawCapacity : 100
 
       const event = await prisma.event.create({
         data: {
@@ -107,7 +108,8 @@ export const eventControllers = {
         return { error: 'Only organizers can suggest events' }
       }
 
-      const { title, description, date, location, capacity = 100 } = body
+      const { title, description, date, location, capacity: rawCapacity } = body
+      const capacity = rawCapacity && rawCapacity > 0 ? rawCapacity : 100
 
       const event = await prisma.event.create({
         data: {
