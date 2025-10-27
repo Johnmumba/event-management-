@@ -92,24 +92,6 @@
             </div>
         </div>
 
-        <!-- Create User Modal (Admin only) -->
-        <div id="createUserModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Create User</h2>
-                <form id="createUserForm">
-                    <input type="email" id="createUserEmail" placeholder="Email" required>
-                    <input type="password" id="createUserPassword" placeholder="Password" required>
-                    <select id="createUserRole">
-                        <option value="ATTENDEE">Attendee</option>
-                        <option value="ORGANIZER">Organizer</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Create User</button>
-                </form>
-            </div>
-        </div>
-
         <!-- Suggest Event Modal (Organizer only) -->
         <div id="suggestEventModal" class="modal">
             <div class="modal-content">
@@ -135,11 +117,14 @@
                     <p id="totalUsersCount">--</p>
                 </div>
             </div>
-            <div class="action-buttons">
-                <button id="createUserBtn" class="btn btn-primary">Create User</button>
-            </div>
             <div id="pendingEventsList" class="events-grid">
                 <!-- Pending events will be loaded here -->
+            </div>
+            <div id="userManagementSection">
+                <h2>User Management</h2>
+                <div id="userList" class="user-list">
+                    <!-- User list will be loaded here -->
+                </div>
             </div>
         </section>
 

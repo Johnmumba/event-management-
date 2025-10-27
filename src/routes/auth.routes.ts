@@ -12,16 +12,23 @@ export default new Elysia()
     console.log('Login request body:', context.body)
     return authControllers.login(context)
   })
-  .post(
-    '/admin/create-user',
-    (context) => authControllers.createUser(context),
+  .get(
+    '/admin/stats',
+    (context) => authControllers.getStats(context),
     {
       beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
     }
   )
   .get(
-    '/admin/stats',
-    (context) => authControllers.getStats(context),
+    '/admin/users',
+    (context) => authControllers.getAllUsers(context),
+    {
+      beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
+    }
+  )
+  .put(
+    '/admin/users/:id/role',
+    (context) => authControllers.updateUserRole(context),
     {
       beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
     }

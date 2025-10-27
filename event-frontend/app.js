@@ -40,7 +40,6 @@ class EventApp {
             if (e.target.id === 'suggestEventBtn') this.showModal('suggestEventModal');
             if (e.target.id === 'viewPendingEventsBtn') this.loadPendingEvents();
             if (e.target.id === 'createEventBtn') this.showModal('createEventModal');
-            if (e.target.id === 'createUserBtn') this.showModal('createUserModal');
             
             if (e.target.className.includes('close')) {
                 e.target.closest('.modal').style.display = 'none';
@@ -66,11 +65,6 @@ class EventApp {
         document.getElementById('suggestEventForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleSuggestEvent(e);
-        });
-
-        document.getElementById('createUserForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleCreateUser(e);
         });
 
         // Close modal when clicking outside
@@ -388,46 +382,6 @@ class EventApp {
         }
     }
 
-    async handleCreateUser(e) {
-        e.preventDefault();
-        console.log('Creating user...');
-
-        const email = document.getElementById('createUserEmail').value;
-        const password = document.getElementById('createUserPassword').value;
-        const role = document.getElementById('createUserRole').value;
-
-        if (!email || !password) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${this.baseUrl}/admin/create-user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                },
-                body: JSON.stringify({ email, password, role })
-            });
-
-            const data = await response.json();
-            console.log('Create user response:', data);
-
-            if (data.user) {
-                alert('User created successfully!');
-                document.getElementById('createUserForm').reset();
-                this.hideModal('createUserModal');
-                this.loadAdminStats();
-            } else {
-                alert(data.error || 'Failed to create user');
-            }
-        } catch (error) {
-            console.error('Create user error:', error);
-            alert('Network error: ' + error.message);
-        }
-    }
-
     async loadPendingEvents() {
         try {
             const response = await fetch(`${this.baseUrl}/events/pending`, {
@@ -616,6 +570,7 @@ class EventApp {
         if (viewPendingEventsBtn) viewPendingEventsBtn.style.display = 'inline-block';
 
         this.loadAdminStats();
+        this.loadUsers();
     }
 
     async loadAdminStats() {
@@ -628,10 +583,72 @@ class EventApp {
 
             const data = await response.json();
             if (data.userCount) {
-                document.getElementById('totalUsersCount').textContent = data.userCount;
+                const userCountElement = document.getElementById('totalUsersCount');
+                if(userCountElement) {
+                    userCountElement.textContent = data.userCount;
+                }
             }
         } catch (error) {
             console.error('Error loading admin stats:', error);
+        }
+    }
+
+    async loadUsers() {
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/users`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            const data = await response.json();
+            if (data.users) {
+                this.displayUsers(data.users);
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    displayUsers(users) {
+        const userList = document.getElementById('userList');
+        if (!userList) return;
+
+        userList.innerHTML = users.map(user => `
+            <div class="user-card">
+                <div class="user-email">${user.email}</div>
+                <div class="user-role">
+                    <select onchange="app.updateUserRole('${user.id}', this.value)">
+                        <option value="ATTENDEE" ${user.role === 'ATTENDEE' ? 'selected' : ''}>Attendee</option>
+                        <option value="ORGANIZER" ${user.role === 'ORGANIZER' ? 'selected' : ''}>Organizer</option>
+                        <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
+                    </select>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async updateUserRole(userId, role) {
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/users/${userId}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify({ role })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('User role updated successfully!');
+                this.loadUsers();
+            } else {
+                alert(data.error || 'Failed to update user role');
+            }
+        } catch (error) {
+            console.error('Error updating user role:', error);
+            alert('Network error: ' + error.message);
         }
     }
 
