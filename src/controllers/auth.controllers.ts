@@ -116,7 +116,7 @@ export const authControllers = {
 
   async getStats({ user }: { user: any }) {
     try {
-      if (user.role !== 'ADMIN') {
+      if (user?.role !== 'ADMIN') {
         return { error: 'Unauthorized' }
       }
 
@@ -133,7 +133,7 @@ export const authControllers = {
 
   async getAllUsers({ user }: { user: any }) {
     try {
-      if (user.role !== 'ADMIN') {
+      if (user?.role !== 'ADMIN') {
         return { error: 'Unauthorized' }
       }
 
@@ -157,7 +157,7 @@ export const authControllers = {
 
   async updateUserRole({ user, params, body }: { user: any, params: { id: string }, body: { role: string } }) {
     try {
-      if (user.role !== 'ADMIN') {
+      if (user?.role !== 'ADMIN') {
         return { error: 'Unauthorized' }
       }
 
