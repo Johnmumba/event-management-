@@ -2,8 +2,8 @@ import { Elysia } from 'elysia'
 import { jwtUtils } from '../utils/jwt.utils.js'
 
 export const authMiddleware = new Elysia()
-  .derive({ as: 'global' }, async (request: any) => {
-    const authHeader = request.headers.authorization
+  .derive({ as: 'scoped' }, async ({ headers }: { headers: any }) => {
+    const authHeader = headers.authorization
     
     if (!authHeader?.startsWith('Bearer ')) {
       return { user: null }
