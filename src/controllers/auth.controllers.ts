@@ -8,29 +8,32 @@ export const authControllers = {
   async signup({ body }: { body: { email: string; password: string; role?: string } }) {
     try {
       console.log('Signup attempt:', body)
-      
-      const { email, password, role = 'ATTENDEE' } = body
-      
-      // Check if user already exists
-      const existingUser = await prisma.user.findUnique({
-        where: { email }
-      })
 
+      const { email, password, role = 'ATTENDEE' } = body
+
+      const userCount = await prisma.user.count()
+      let assignedRole = role
+
+      if (userCount === 0) {
+        assignedRole = 'ADMIN'
+      } else if (role === 'ADMIN') {
+        return { error: 'Cannot register as an admin. Please choose another role.' }
+      }
+
+      const existingUser = await prisma.user.findUnique({ where: { email } })
       if (existingUser) {
         console.log('User already exists:', email)
         return { error: 'User already exists' }
       }
 
-      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10)
       console.log('Password hashed successfully')
 
-      // Create user
       const user = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
-          role: role as any
+          role: assignedRole as any
         },
         select: {
           id: true,
@@ -107,6 +110,71 @@ export const authControllers = {
 
     } catch (error: any) {
       console.error('Login error:', error)
+      return { error: 'Internal server error: ' + error.message }
+    }
+  },
+
+  async createUser({ body }: { body: { email: string; password: string; role?: string } }) {
+    try {
+      console.log('Admin creating user:', body)
+
+      const { email, password, role = 'ATTENDEE' } = body
+
+      // Check if user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      })
+
+      if (existingUser) {
+        console.log('User already exists:', email)
+        return { error: 'User already exists' }
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10)
+      console.log('Password hashed successfully')
+
+      // Create user
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          role: role as any
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true
+        }
+      })
+
+      console.log('User created by admin:', user)
+
+      return {
+        message: 'User created successfully by admin',
+        user
+      }
+
+    } catch (error: any) {
+      console.error('Admin create user error:', error)
+      return { error: 'Internal server error: ' + error.message }
+    }
+  },
+
+  async getStats({ user }: { user: any }) {
+    try {
+      if (user.role !== 'ADMIN') {
+        return { error: 'Unauthorized' }
+      }
+
+      const userCount = await prisma.user.count()
+
+      return {
+        userCount
+      }
+    } catch (error: any) {
+      console.error('Get stats error:', error)
       return { error: 'Internal server error: ' + error.message }
     }
   }
