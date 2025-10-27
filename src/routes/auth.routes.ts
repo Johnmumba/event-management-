@@ -12,24 +12,27 @@ export default new Elysia()
     console.log('Login request body:', context.body)
     return authControllers.login(context)
   })
-  .get(
-    '/admin/stats',
-    (context) => authControllers.getStats(context),
-    {
-      beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
-    }
-  )
-  .get(
-    '/admin/users',
-    (context) => authControllers.getAllUsers(context),
-    {
-      beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
-    }
-  )
-  .put(
-    '/admin/users/:id/role',
-    (context) => authControllers.updateUserRole(context),
-    {
-      beforeHandle: [authMiddleware, requireRole(['ADMIN'])]
-    }
+  .group('/admin', (app) => app
+    .use(authMiddleware)
+    .get(
+      '/stats',
+      (context) => authControllers.getStats(context),
+      {
+        beforeHandle: [requireRole(['ADMIN'])]
+      }
+    )
+    .get(
+      '/users',
+      (context) => authControllers.getAllUsers(context),
+      {
+        beforeHandle: [requireRole(['ADMIN'])]
+      }
+    )
+    .put(
+      '/users/:id/role',
+      (context) => authControllers.updateUserRole(context),
+      {
+        beforeHandle: [requireRole(['ADMIN'])]
+      }
+    )
   )
