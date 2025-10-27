@@ -564,10 +564,12 @@ class EventApp {
         const createEventBtn = document.getElementById('createEventBtn');
         const adminPanel = document.getElementById('adminPanel');
         const viewPendingEventsBtn = document.getElementById('viewPendingEventsBtn');
+        const userManagementSection = document.getElementById('userManagementSection');
         
         if (createEventBtn) createEventBtn.style.display = 'inline-block';
         if (adminPanel) adminPanel.style.display = 'block';
         if (viewPendingEventsBtn) viewPendingEventsBtn.style.display = 'inline-block';
+        if (userManagementSection) userManagementSection.style.display = 'block';
 
         this.loadAdminStats();
         this.loadUsers();
@@ -656,10 +658,12 @@ class EventApp {
         const createEventBtn = document.getElementById('createEventBtn');
         const adminPanel = document.getElementById('adminPanel');
         const viewPendingEventsBtn = document.getElementById('viewPendingEventsBtn');
+        const userManagementSection = document.getElementById('userManagementSection');
         
         if (createEventBtn) createEventBtn.style.display = 'none';
         if (adminPanel) adminPanel.style.display = 'none';
         if (viewPendingEventsBtn) viewPendingEventsBtn.style.display = 'none';
+        if (userManagementSection) userManagementSection.style.display = 'none';
     }
 
     // 🎯 UTILITY METHODS
