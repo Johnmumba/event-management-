@@ -114,54 +114,6 @@ export const authControllers = {
     }
   },
 
-  async createUser({ body }: { body: { email: string; password: string; role?: string } }) {
-    try {
-      console.log('Admin creating user:', body)
-
-      const { email, password, role = 'ATTENDEE' } = body
-
-      // Check if user already exists
-      const existingUser = await prisma.user.findUnique({
-        where: { email }
-      })
-
-      if (existingUser) {
-        console.log('User already exists:', email)
-        return { error: 'User already exists' }
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10)
-      console.log('Password hashed successfully')
-
-      // Create user
-      const user = await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-          role: role as any
-        },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          createdAt: true
-        }
-      })
-
-      console.log('User created by admin:', user)
-
-      return {
-        message: 'User created successfully by admin',
-        user
-      }
-
-    } catch (error: any) {
-      console.error('Admin create user error:', error)
-      return { error: 'Internal server error: ' + error.message }
-    }
-  },
-
   async getStats({ user }: { user: any }) {
     try {
       if (user.role !== 'ADMIN') {
@@ -175,6 +127,53 @@ export const authControllers = {
       }
     } catch (error: any) {
       console.error('Get stats error:', error)
+      return { error: 'Internal server error: ' + error.message }
+    }
+  },
+
+  async getAllUsers({ user }: { user: any }) {
+    try {
+      if (user.role !== 'ADMIN') {
+        return { error: 'Unauthorized' }
+      }
+
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true
+        }
+      })
+
+      return {
+        users
+      }
+    } catch (error: any) {
+      console.error('Get all users error:', error)
+      return { error: 'Internal server error: ' + error.message }
+    }
+  },
+
+  async updateUserRole({ user, params, body }: { user: any, params: { id: string }, body: { role: string } }) {
+    try {
+      if (user.role !== 'ADMIN') {
+        return { error: 'Unauthorized' }
+      }
+
+      const { id } = params
+      const { role } = body
+
+      await prisma.user.update({
+        where: { id },
+        data: { role: role as any }
+      })
+
+      return {
+        success: true
+      }
+    } catch (error: any) {
+      console.error('Update user role error:', error)
       return { error: 'Internal server error: ' + error.message }
     }
   }
