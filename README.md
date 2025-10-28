@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# software-design
+# Software-design
  assignment 1 and 2
 - Design patterns-Singleton
 - 2410039 - Mwape Bwalya BSE Year 2 S2
