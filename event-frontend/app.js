@@ -228,8 +228,39 @@ class EventApp {
                         ✅ Approve Event
                     </button>
                 ` : ''}
+                ${this.user && this.user.role === 'ADMIN' ? `
+                    <button class="btn btn-danger" onclick="app.deleteEvent('${event.id}')">
+                        🗑️ Delete Event
+                    </button>
+                ` : ''}
             </div>
         `).join('');
+    }
+
+    async deleteEvent(eventId) {
+        if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
+
+        try {
+            const response = await fetch(`${this.baseUrl}/events/${eventId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            const data = await response.json();
+            console.log('Delete event response:', data);
+
+            if (data.message) {
+                alert('🗑️ Event deleted successfully!');
+                this.loadEvents();
+            } else {
+                alert(data.error || 'Failed to delete event');
+            }
+        } catch (error) {
+            console.error('Delete event error:', error);
+            alert('Network error: ' + error.message);
+        }
     }
 
     async handleCreateEvent(e) {

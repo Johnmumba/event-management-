@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes.js'
 import eventRoutes from './routes/event.routes.js'
 import rsvpRoutes from './routes/rsvp.routes.js'
 import notificationRoutes from './routes/notification.routes.js'
+import { swagger } from '@elysiajs/swagger'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
@@ -12,6 +13,7 @@ const prisma = new PrismaClient()
 
 const app = new Elysia()
   .use(cors())
+  .use(swagger())
   
   // Serve frontend files
   .get('/', async () => {
@@ -64,35 +66,12 @@ const app = new Elysia()
     }
   })
   
-  // API documentation endpoint (simple version)
-  .get('/docs', () => {
-    return `
-      <html>
-        <body>
-          <h1>Event Management API Documentation</h1>
-          <h2>Endpoints:</h2>
-          <ul>
-            <li><strong>POST /signup</strong> - User registration</li>
-            <li><strong>POST /login</strong> - User login</li>
-            <li><strong>GET /events</strong> - Get all events (auth required)</li>
-            <li><strong>POST /events</strong> - Create event (admin only)</li>
-            <li><strong>POST /events/suggest</strong> - Suggest event (organizer only)</li>
-            <li><strong>PUT /events/:id/approve</strong> - Approve event (admin only)</li>
-            <li><strong>GET /events/pending</strong> - Get pending events (admin only)</li>
-            <li><strong>POST /events/:id/rsvp</strong> - RSVP to event (auth required)</li>
-            <li><strong>GET /notifications</strong> - Get user notifications</li>
-            <li><strong>PUT /notifications/:id/read</strong> - Mark notification as read</li>
-          </ul>
-        </body>
-      </html>
-    `
-  })
   .listen(3000)
 
 console.log('=========================================')
 console.log('🚀 Event Management App - FULL STACK READY!')
 console.log('📍 Frontend: http://localhost:3000')
-console.log('📚 API Docs: http://localhost:3000/docs')
+console.log('📚 API Docs: http://localhost:3000/swagger')
 console.log('❤️  Health: http://localhost:3000/health')
 console.log('')
 console.log('✅ FEATURES:')

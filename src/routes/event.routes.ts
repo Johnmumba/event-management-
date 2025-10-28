@@ -18,3 +18,6 @@ export default new Elysia()
   .get('/events/pending', (context) => eventControllers.getPendingEvents(context), {
     beforeHandle: [requireRole(['ADMIN'])]
   })
+  .delete('/events/:id', (context) => eventControllers.deleteEvent(context), {
+    beforeHandle: [requireRole(['ADMIN'])]
+  })
