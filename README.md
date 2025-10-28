@@ -1,10 +1,10 @@
 <<<<<<< HEAD
 # software-design
  assignment 1 and 2
--Design patterns - Singleton
--2410039 - Mwape Bwalya BSE Year 2 S2
--2420949 - John Bwalya Mumba BSE Year 2 S1
--2410050 - Fortune Jere BSE Year 2 S2
+- Design patterns - Singleton
+- 2410039 - Mwape Bwalya BSE Year 2 S2
+- 2420949 - John Bwalya Mumba BSE Year 2 S1
+- 2410050 - Fortune Jere BSE Year 2 S2
 # Event Management App
 
 A full-stack event management application built with Elysia.js, Bun, and PostgreSQL.
