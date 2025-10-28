@@ -208,5 +208,22 @@ export const eventControllers = {
       console.error('Get pending events error:', error)
       return { error: 'Failed to fetch pending events' }
     }
+  },
+
+  async deleteEvent({ params, user }: { params: { id: string }; user: any }) {
+    try {
+      if (!user || user.role !== 'ADMIN') {
+        return { error: 'Admin access required' }
+      }
+
+      await prisma.event.delete({
+        where: { id: params.id }
+      })
+
+      return { message: 'Event deleted successfully' }
+    } catch (error: any) {
+      console.error('Delete event error:', error)
+      return { error: 'Failed to delete event' }
+    }
   }
 }
