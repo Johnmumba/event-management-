@@ -149,11 +149,11 @@ This app is deployed on Render and uses Neon PostgreSQL database.
 
 ---
 
-**Submission**
+**Submission URL**
 
-**Live Demo**: [Your Render URL]
+**Live Demo**: [https://event-management-0gqh.onrender.com/]
 
-**Video Demo**: [Your Video URL]
+**Video Demo**: [https://www.loom.com/share/c09d30ac8f5a430f9886ba53fd5de429]
 
 
 =======
